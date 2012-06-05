@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+  xsi:schemaLocation="
+ 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+	">
+
+  <jpa:repositories base-package="com.kerz.oauth.dao.jpa" />
+
+  <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${${jpa.database}.driverClassName}" />
+    <property name="url" value="${${jpa.database}.url}" />
+    <property name="username" value="${${jpa.database}.username}" />
+    <property name="password" value="${${jpa.database}.password}" />
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+  </bean>
+
+  <!-- <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" /> -->
+  <!-- <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager" /> -->
+  <tx:annotation-driven transaction-manager="transactionManager" />
+
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="packagesToScan" value="com.kerz.oauth.domain" />
+    <property name="persistenceProviderClass" value="${jpa.provider}" />
+    <property name="jpaProperties">
+      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean" p:location="classpath:${jpa.database}.persistence.properties" />
+    </property>
+    <!-- <property name="persistenceUnitManager"> -->
+    <!-- <bean class="org.springframework.data.jpa.support.MergingPersistenceUnitManager" p:defaultDataSource-ref="dataSource" /> -->
+    <!-- </property> -->
+  </bean>
+
+</beans>
