@@ -11,33 +11,36 @@
 
   <jpa:repositories base-package="com.kerz.oauth.dao.jpa" />
 
-  <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+ 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
 
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    <property name="driverClassName" value="${${jpa.database}.driverClassName}" />
-    <property name="url" value="${${jpa.database}.url}" />
-    <property name="username" value="${${jpa.database}.username}" />
-    <property name="password" value="${${jpa.database}.password}" />
-  </bean>
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
 
-  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
-  </bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
-  <!-- <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" /> -->
-  <!-- <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager" /> -->
-  <tx:annotation-driven transaction-manager="transactionManager" />
-
-  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-    <property name="dataSource" ref="dataSource" />
-    <property name="packagesToScan" value="com.kerz.oauth.domain" />
-    <property name="persistenceProviderClass" value="${jpa.provider}" />
-    <property name="jpaProperties">
-      <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean" p:location="classpath:${jpa.database}.persistence.properties" />
-    </property>
-    <!-- <property name="persistenceUnitManager"> -->
-    <!-- <bean class="org.springframework.data.jpa.support.MergingPersistenceUnitManager" p:defaultDataSource-ref="dataSource" /> -->
-    <!-- </property> -->
-  </bean>
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="persistenceProviderClass" value="${jpa.provider}" />
+		<property name="jpaProperties">
+			<bean class="org.springframework.beans.factory.config.PropertiesFactoryBean" p:location="classpath:persistence.properties">
+				<property name="properties">
+					<props>
+						<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+					</props>
+				</property>
+			</bean>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.kerz.oauth.domain</value>
+			</list>
+		</property>
+	</bean>
 
 </beans>

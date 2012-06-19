@@ -9,7 +9,7 @@
 	http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
 	">
 
-	<import resource="spring-beans.xml" />
+	<import resource="property-beans.xml" />
 	<import resource="data-beans.xml" />
 	<import resource="service-beans.xml" />
 
